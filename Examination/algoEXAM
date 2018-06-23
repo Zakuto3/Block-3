@@ -1,0 +1,137 @@
+den optimering som saknar är att vi inte behöver titta på sista "osorterade" elementen, då
+den måste vara på rätt plats för att den den sista kvarstående element som är minst(eller störst beronde
+på implementeringen). vi får två extra jemförelser utan omptimeringen.
+
+
+static void bubbleSort(ElementType* arrayToSort, size_t size, Statistics* statistics)
+{
+	int i,step,temp;
+
+	for(step=0;lessThan(step,size-1,statistics);++step)//tar vi bort -1 från size så får vi samma resultat som delupgiften på jämförelser
+	{
+		for(i=0;lessThan(i,size-step-1,statistics);++i)
+		{
+			if(greaterThan(arrayToSort[i],arrayToSort[i+1],statistics))
+			{
+			swapElements(&arrayToSort[i],&arrayToSort[i+1],statistics);
+			}
+		}
+	}
+}
+---------------------------------------------
+--------         Bubble sort        ---------
+---------------------------------------------
+
+Osorterat:
+  10 element:   109 jämförelser,     6 byten
+  20 element:   419 jämförelser,   113 byten
+  40 element:  1639 jämförelser,   474 byten
+
+Sorterat:
+  10 element:   109 jämförelser,     0 byten
+  20 element:   419 jämförelser,     0 byten
+  40 element:  1639 jämförelser,     0 byten
+
+Bakåtsorterat:
+  10 element:   109 jämförelser,    45 byten
+  20 element:   419 jämförelser,   190 byten
+  40 element:  1639 jämförelser,   780 byten
+
+
+
+i denna deluppgift vill jag visa 2 koder, optimeringen kan ske vid jemförelser i inre lopen
+och en variabel.
+första koden visar en icke optimerad version av insertonsort, då finnst det ingen "key"
+en variabel som håller ett värde för att bytas med en gång i en iteration, detta sänker
+antal jemförelser som behövs då inre lopen "gör plats" för key. jag har kommenterad "OPTIMIZED"
+på de ställerna som har ändrats. resultaten från uppgiften har dock mycket mer jämförelser iallafall,
+den jag skrev för lab5 är kod2 som visas här, så jag jobbar backlänges. Kan också vara att koden i uppgiften
+jemför hela arrayen efter ett störe tal varje gång, även den sorterade biten, en optimering är då defentivt att bara gemför
+de element vi inte har jemfört. detta optimering skulle då sitta i yttre lopen.
+
+	static void insertionSort(ElementType* arrayToSort, size_t size, Statistics* statistics)
+	{
+		int i,j;
+		//begin at second element then goes through the whole array
+		for (i = 0; lessThan(i,size,statistics); i++)
+		{
+			j = i;
+			//first compare the two elements. then goes trough
+			greaterThanOrEqualTo(j,0,statistics); //crashes when this is inside while
+			while (j >= 0 && greaterThan(arrayToSort[j-1], arrayToSort[j],statistics))
+			{
+				swapElements(&arrayToSort[j],&arrayToSort[j-1],statistics);
+				--j;
+			}
+		}
+	}
+	---------------------------------------------
+	--------       Insertion sort       ---------
+	---------------------------------------------
+
+	Osorterat:
+	  10 element:    45 jämförelser,    16 byten
+	  20 element:   189 jämförelser,   133 byten
+	  40 element:   632 jämförelser,   514 byten
+
+	Sorterat:
+	  10 element:    40 jämförelser,    10 byten
+	  20 element:    80 jämförelser,    20 byten
+	  40 element:   160 jämförelser,    40 byten
+
+	Bakåtsorterat:
+	  10 element:    76 jämförelser,    55 byten
+	  20 element:   251 jämförelser,   210 byten
+	  40 element:   901 jämförelser,   820 byten
+
+
+
+
+
+		static void insertionSort(ElementType* arrayToSort, size_t size, Statistics* statistics)
+		{
+			int i, key, j; //Key is OPTIMIZATION
+			ElementType temp[1] = {0};
+			//begin at second element then goes through the whole array
+			for (i = 0; lessThan(i,size,statistics); i++)
+			{
+				key = arrayToSort[i]; //key is the next element to find its sorted place OPTIMIZED
+				j = i-1;
+				//first compare the two elements. then goes trough
+				greaterThanOrEqualTo(j,0,statistics); //crashes when this is inside while
+				while (j >= 0 && greaterThan(arrayToSort[j], key,statistics)) //compare to key instead is OPTIMATION
+				{
+					swapElements(&temp[0],&temp[0],statistics);
+					arrayToSort[j+1] = arrayToSort[j];//shots forward the whole sorted array until index with lessthan key position is found
+					--j;
+				}
+				arrayToSort[j+1] = key; //inserts key to correct position, this is an OPTIMIATION
+			}
+		}
+		---------------------------------------------
+		--------       Insertion sort       ---------
+		---------------------------------------------
+
+		Osorterat:
+		  10 element:    35 jämförelser,     6 byten
+		  20 element:   169 jämförelser,   113 byten
+		  40 element:   592 jämförelser,   474 byten
+
+		Sorterat:
+		  10 element:    30 jämförelser,     0 byten
+		  20 element:    60 jämförelser,     0 byten
+		  40 element:   120 jämförelser,     0 byten
+
+		Bakåtsorterat:
+		  10 element:    66 jämförelser,    45 byten
+		  20 element:   231 jämförelser,   190 byten
+		  40 element:   861 jämförelser,   780 byten
+
+
+
+
+Denna uppgift var lite klurig. både sorterad och bakåtsorterat har O=(n^2) i jämförelser.
+beroende om man sorterar från störst till minst eller svärtom så är första eller sista Element
+som har valts till pivot. men för att få worst case i både sorterad och bakåtsorterat så kan det inte vara
+först eller sista element som är pivot. min quicksort har dock många mer byten i bakåtsorterat när jag
+väljer mitten av arrayen som pivot. Men jag misstänker endå att pivoten som har valts är mitten av arrayen.
